@@ -182,6 +182,18 @@ api:
     databasePort: "3306"
     redisHostname: ""
     redisPassword: ""
+  volumes:
+    - name: known-hosts
+      configMap:
+        name: terrakube-other-files
+        items:
+          - key: known_hosts
+            path: known_hosts
+            mode: 0644
+  volumeMounts:
+    - name: known-hosts
+      mountPath: /home/cnb/.ssh/known_hosts
+      subPath: known_hosts
 
 
 ## The database port is only used for mysql databases
@@ -211,6 +223,18 @@ registry:
   serviceType: "ClusterIP"
   serviceAccountName: ""
   resources: {}
+  volumes:
+    - name: known-hosts
+      configMap:
+        name: terrakube-other-files
+        items:
+          - key: known_hosts
+            path: known_hosts
+            mode: 0644
+  volumeMounts:
+    - name: known-hosts
+      mountPath: /home/cnb/.ssh/known_hosts
+      subPath: known_hosts
 
 ## UI Properties
 ui:
