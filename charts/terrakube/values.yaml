@@ -1,6 +1,9 @@
 ## Global Name
 name: "terrakube"
 
+global:
+  imagePullSecrets: []
+
 ## Azure Active Directory Security
 security:
   useOpenLDAP: true
@@ -12,6 +15,18 @@ security:
   dexIssuerUri: "http://terrakube-api.minikube.net/dex"
   existingSecret: false
   ldapConfigSecretName: terrakube-openldap-secrets
+
+## OpenLdap
+openldap:
+  adminUser: "admin"
+  adminPass: "admin"
+  baseRoot: "dc=example,dc=org"
+  image: "bitnami/openldap"
+  version: "2.6.4-debian-11-r4"
+  imagePullSecrets: []
+  podLabels: {}
+  securityContext: {}
+  containerSecurityContext: {}
 
 ## Dex
 dex:
@@ -157,15 +172,20 @@ redis:
 api:
   existingSecret: false
   enabled: true
+  image: azbuilder/api-server
   version: ""
   replicaCount: "1"
   serviceType: "ClusterIP"
   serviceAccountName: ""
   resources: {}
+  podLabels: {}
   defaultDatabase: true
   defaultRedis: true
   loadSampleData: true
   terraformReleasesUrl: "https://releases.hashicorp.com/terraform/index.json"
+  securityContext: {}
+  containerSecurityContext: {}
+  imagePullSecrets: []
   cache:
     moduleCacheMaxTotal: "128"
     moduleCacheMaxIdle: "128"
@@ -177,6 +197,7 @@ api:
     databaseHostname: ""
     databaseName: ""
     databaseUser: ""
+    databaseSchema: "public"
     databasePassword: ""
     databaseSslMode: "disable"
     databasePort: "3306"
@@ -205,19 +226,26 @@ api:
 executor:
   existingSecret: false
   enabled: true
+  image: "azbuilder/executor"
   version: ""
   replicaCount: "1"
   serviceType: "ClusterIP"
   serviceAccountName: ""
   resources: {}
+  podLabels: {}
+  apiServiceUrl: "http://terrakube-api-service:8080"
   properties:
     toolsRepository: "https://github.com/AzBuilder/terrakube-extensions"
     toolsBranch: "main"
-
+  securityContext: {}
+  containerSecurityContext: {}
+  imagePullSecrets: []
+  
 ## Registry properties
 registry:
   enabled: true
   existingSecret: false
+  image: azbuilder/open-registry
   version: ""
   replicaCount: "1"
   serviceType: "ClusterIP"
@@ -235,16 +263,25 @@ registry:
     - name: known-hosts
       mountPath: /home/cnb/.ssh/known_hosts
       subPath: known_hosts
+  podLabels: {}
+  securityContext: {}
+  containerSecurityContext: {}
+  imagePullSecrets: []
 
 ## UI Properties
 ui:
   enabled: true
   existingSecret: false
+  image: azbuilder/terrakube-ui
   version: ""
   replicaCount: "1"
   serviceType: "ClusterIP"
   serviceAccountName: ""
   resources: {}
+  podLabels: {}
+  securityContext: {}
+  containerSecurityContext: {}
+  imagePullSecrets: []
 
 ## Ingress properties
 ingress:
@@ -255,6 +292,7 @@ ingress:
     domain: "terrakube-ui.minikube.net"
     path: "/"
     pathType: "Prefix"
+    ingressClassName: "nginx"
     tlsSecretName: tls-secret-ui-terrakube
     annotations:
       nginx.ingress.kubernetes.io/use-regex: "true"
@@ -263,6 +301,7 @@ ingress:
     domain: "terrakube-api.minikube.net"
     path: "/"
     pathType: "Prefix"
+    ingressClassName: "nginx"
     tlsSecretName: tls-secret-api-terrakube
     annotations:
       nginx.ingress.kubernetes.io/use-regex: "true"
@@ -272,6 +311,7 @@ ingress:
     domain: "terrakube-reg.minikube.net"
     path: "/"
     pathType: "Prefix"
+    ingressClassName: "nginx"
     tlsSecretName: tls-secret-reg-terrakube
     annotations:
       nginx.ingress.kubernetes.io/use-regex: "true"

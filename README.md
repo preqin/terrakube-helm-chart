@@ -231,6 +231,7 @@ Once you have completed the above steps you can complete the file values.yaml to
 | Key                                       | Required | Description                                                            |
 |:------------------------------------------|----------|------------------------------------------------------------------------|
 | name                                      | Yes      | Use "Terrakube"                                                        |
+| global.imagePullSecrets                   | No       | Global Secret used to pull images from private repository              |
 | security.adminGroup                       | Yes      | Admin group inside Terrakube                                           |
 | security.patSecret                        | Yes      | 32 Character secret to sign personal access token                      |
 | security.internalSecret                   | Yes      | 32 Character secret to sing internal                                   |
@@ -238,6 +239,15 @@ Once you have completed the above steps you can complete the file values.yaml to
 | security.dexClientScope                   | Yes      | Use "email openid profile offline_access groups"                       |
 | security.gcpCredentials                   | No       | JSON Credentials for Google Identity Authentication                    |
 | security.caCerts                          | No       | Custom CA certificates to be added at runtime                          |
+| openldap.adminUser                        | Yes      | LDAP deployment admin user                                             |
+| openldap.adminPass                        | Yes      | LDAP deployment admin password                                         |
+| openldap.baseRoot                         | Yes      | LDAP baseDN (or suffix) of the LDAP tree                               |
+| openldap.image                            | Yes      | LDAP deployment image repository                                       |
+| openldap.version                          | Yes      | LDAP deployment image tag                                              |
+| openldap.imagePullSecrets                 | No       | Secret used to pull images from private repository                     |
+| openldap.podLabels                        | No       | Pod labels for LDAP deployment                                         |
+| openldap.securityContext                  | No       | Security context for LDAP deployment                                   |
+| openldap.containerSecurityContext         | No       | Container security context for LDAP deployment                         |
 | storage.defaultStorage                    | No       | Enable default storage using minio helm chart                          |
 | storage.gcp.projectId                     | No       | GCP Project Id for the storage                                         |
 | storage.gcp.bucketName                    | No       | GCP Bucket name for the storage                                        |
@@ -258,6 +268,7 @@ Once you have completed the above steps you can complete the file values.yaml to
 | api.enabled                               | Yes      | true/false                                                             |
 | api.defaultRedis                          | No       | Enable default Redis using Bitnami helm chart                          |
 | api.defaultDatabase                       | No       | Enable default database using postgresql helm chart                    |
+| api.image                                 | No       | API image repository                                                   |
 | api.version                               | Yes      | Terrakube API version                                                  |
 | api.replicaCount                          | Yes      |                                                                        |
 | api.serviceAccountName                    | No       | Kubernetes Service Account name                                        |
@@ -270,7 +281,11 @@ Once you have completed the above steps you can complete the file values.yaml to
 | api.properties.databaseName               | No       |                                                                        |
 | api.properties.databaseUser               | No       |                                                                        |
 | api.properties.databasePassword           | No       |                                                                        |
+| api.securityContext                       | No       | Fill securityContext field                                             |
+| api.containerSecurityContext              | No       | Fill securityContext field in the container spec                       |
+| api.imagePullSecrets                      | No       | Specific Secret used to pull images from private repository            |
 | executor.enabled                          | Yes      | true/false                                                             |
+| executor.image                            | No       | Executor image repository                                              |
 | executor.version                          | Yes      | Terrakube Executor version                                             |
 | executor.replicaCount                     | Yes      |                                                                        |
 | executor.serviceAccountName               | No       | Kubernetes Service Account name                                        |
@@ -280,7 +295,11 @@ Once you have completed the above steps you can complete the file values.yaml to
 | executor.volumeMounts                     | No       |                                                                        |
 | executor.properties.toolsRepository       | Yes      | Example: https://github.com/AzBuilder/terrakube-extensions             |
 | executor.properties.toolsBranch           | Yes      | Example: main                                                          |
+| executor.securityContext                  | No       | Fill securityContext field                                             |
+| executor.containerSecurityContext         | No       | Fill securityContext field in the container spec                       |
+| executor.imagePullSecrets                 | No       | Specific Secret used to pull images from private repository            |
 | registry.enabled                          | Yes      |                                                                        |
+| registry.image                            | No       | Registry image repository                                              |
 | registry.version                          | Yes      |                                                                        |
 | registry.replicaCount                     | Yes      |                                                                        |
 | registry.serviceAccountName               | No       | Kubernetes Service Account name                                        |
@@ -288,23 +307,33 @@ Once you have completed the above steps you can complete the file values.yaml to
 | registry.env                              | No       |                                                                        |
 | registry.volumes                          | No       |                                                                        |
 | registry.volumeMounts                     | No       |                                                                        |
+| registry.securityContext                  | No       | Fill securityContext field                                             |
+| registry.containerSecurityContext         | No       | Fill securityContext field in the container spec                       |
+| registry.imagePullSecrets                 | No       | Specific Secret used to pull images from private repository            |
 | ui.enabled                                | Yes      | true/false                                                             |
+| ui.image                                  | No       | UI image repository                                                    |
 | ui.version                                | Yes      |                                                                        |
 | ui.replicaCount                           | Yes      |                                                                        |
 | ui.serviceAccountName                     | No       | Kubernetes Service Account name                                        |
 | ui.serviceType                            | Yes      | ClusterIP/NodePort/LoadBalancer/ExternalName                           |
+| ui.securityContext                        | No       | Fill securityContext field                                             |
+| ui.containerSecurityContext               | No       | Fill securityContext field in the container spec                       |
+| ui.imagePullSecrets                       | No       | Specific Secret used to pull images from private repository            |
+| ingress.ui.ingressClassName               | Yes      | Default is set to nginx                                                |
 | ingress.ui.useTls                         | Yes      | true/false                                                             |
 | ingress.ui.enabled                        | Yes      | true/false                                                             |
 | ingress.ui.domain                         | Yes      |                                                                        |
 | ingress.ui.path                           | Yes      | ImplementationSpecific/Exact/Prefix                                    |
 | ingress.ui.pathType                       | Yes      |                                                                        |
 | ingress.ui.annotations                    | Yes      | Ingress annotations                                                    |
+| ingress.api.ingressClassName              | Yes      | Default is set to nginx                                                |
 | ingress.api.useTls                        | Yes      |                                                                        |
 | ingress.api.enabled                       | Yes      |                                                                        |
 | ingress.api.domain                        | Yes      |                                                                        |
 | ingress.api.path                          | Yes      |                                                                        |
 | ingress.api.pathType                      | Yes      | ImplementationSpecific/Exact/Prefix                                    |
 | ingress.api.annotations                   | Yes      | Ingress annotations                                                    |
+| ingress.registry.ingressClassName         | Yes      | Default is set to nginx                                                |
 | ingress.registry.useTls                   | Yes      |                                                                        |
 | ingress.registry.enabled                  | Yes      |                                                                        |
 | ingress.registry.domain                   | Yes      |                                                                        |
